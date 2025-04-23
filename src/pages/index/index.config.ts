@@ -1,3 +1,5 @@
 export default definePageConfig({
-  navigationBarTitleText: '首页'
-})
+  navigationBarTitleText: "无锡市施工项目申报平台",
+  navigationBarBackgroundColor: "#fff",
+  navigationBarTextStyle: "black",
+});

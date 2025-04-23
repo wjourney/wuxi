@@ -4,8 +4,7 @@ module.exports = {
   presets: [
     ['taro', {
       framework: 'react',
-      ts: true,
-      compiler: 'vite',
+      ts: true
     }]
   ]
 }

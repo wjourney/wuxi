@@ -1,29 +1,26 @@
-import { Component, PropsWithChildren } from 'react'
-import { View, Text } from '@tarojs/components'
-import { AtButton } from 'taro-ui'
+import { View, Text, Image } from "@tarojs/components";
+import { useLoad } from "@tarojs/taro";
+import "./index.scss";
+import Taro from "@tarojs/taro";
 
-import "taro-ui/dist/style/components/button.scss" // 按需引入
-import './index.scss'
+export default function Index() {
+  useLoad(() => {
+    console.log("Page loaded.");
+  });
 
-export default class Index extends Component<PropsWithChildren> {
-  componentDidMount () { }
-
-  componentWillUnmount () { }
-
-  componentDidShow () { }
-
-  componentDidHide () { }
-
-  render () {
-    return (
-      <View className='<%= pageName %>'>
-        <Text>Hello world!</Text>
-        <AtButton type='primary'>I need Taro UI</AtButton>
-        <Text>Taro UI 支持 Vue 了吗？</Text>
-        <AtButton type='primary' circle={true}>支持</AtButton>
-        <Text>共建？</Text>
-        <AtButton type='secondary' circle={true}>来</AtButton>
+  return (
+    <View className="page_view">
+      <View className="title">选择施工作业类型</View>
+      <View
+        className="summer_view"
+        onClick={() => Taro.navigateTo({ url: "/pages/summer/index" })}
+      >
+        <Text className="summer_text">夏季涉VOCs类</Text>
+        <Image
+          className="arrow_icon"
+          src={require("../../assets/images/arrow-right.svg")}
+        />
       </View>
-    )
-  }
+    </View>
+  );
 }
