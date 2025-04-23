@@ -25,7 +25,18 @@ export default function Summer() {
   };
 
   // 提交表单
-  const handleSubmit = () => {
+  const handleSubmit =async () => {
+    const result = await wx.cloud.callContainer({
+        "config": {
+          "env": "prod-4gcsgqa75da26b30"
+        },
+        "path": "/api/count",
+        "header": {
+          "X-WX-SERVICE": "koa-s36g"
+        },
+        "method": "GET",
+    })
+    console.log(">>>>>>", result);
     console.log("提交的表单数据：", formData);
     // 这里添加提交表单的逻辑
   };

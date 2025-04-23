@@ -5,6 +5,8 @@ import './app.scss'
 function App({ children }: PropsWithChildren<any>) {
 
   useLaunch(() => {
+    // 使用callContainer前一定要init一下，全局执行一次即可
+    wx.cloud.init()
     console.log('App launched.')
   })
 
