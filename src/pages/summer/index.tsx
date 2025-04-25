@@ -7,7 +7,7 @@ import {
   RadioGroup,
   Text,
 } from "@tarojs/components";
-import { useLoad, chooseImage } from "@tarojs/taro";
+import { useLoad, chooseImage, chooseMessageFile } from "@tarojs/taro";
 import { useState } from "react";
 import { Picker } from "@tarojs/components";
 import Taro from "@tarojs/taro";
@@ -37,6 +37,26 @@ const projectTypeList = [
   "道路地面划线",
   "大中型装修",
 ];
+// 申报施工项目
+interface Project {
+  projectName: string// 项目名称
+  companyName: string// 建设单位名称
+  companyCode: string// 组织机构代码
+  projectManagerName: string// 施工负责人
+  projectManagerPhone: string// 施工负责人电话
+  isAuthorized: string// 是否受法人授权
+  district: string// 行政划分
+  projectAddress: string// 作业地址
+  location: string// 坐标位置
+  selectedLocation: LocationData// 选择的坐标位置
+  projectType: string// 作业类型
+  startTime: string// 计划开始时间
+  endTime: string// 计划结束时间
+  projectContent: string// 具体作业内容
+  materialList: Material[]// 主要原辅材料列表
+  img: string
+  isSafeSite: string// 是否安全作业场地
+}
 
 interface LocationData {
   name: string;
@@ -46,10 +66,10 @@ interface LocationData {
 }
 
 interface Material {
-  materialName: string;
-  materialCount: string;
-  materialUnit: string;
-  isVocRateLower: boolean;
+  materialName: string;// 主要原辅材料名称
+  materialCount: string;// 数量
+  materialUnit: string;// 单位
+  isVocRateLower: boolean;// 是否VOC浓度低于20%
 }
 
 export default function Summer() {
@@ -60,7 +80,7 @@ export default function Summer() {
   // );
   const [loading, setLoading] = useState(false);
   // 表单数据状态
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Project>({
     projectName: "",
     companyName: "",
     companyCode: "",
@@ -77,7 +97,7 @@ export default function Summer() {
     projectContent: "",
     materialList: [] as Material[],
     img: "", // 上传图片
-    isSafeSite: "1", // 默认选择"是"
+    isSafeSite: "0", // 默认选择"是"
   });
 
   useLoad(() => {
@@ -85,7 +105,7 @@ export default function Summer() {
   });
 
   // 处理输入变化
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: any) => {
     setFormData({
       ...formData,
       [field]: value,
@@ -148,17 +168,18 @@ export default function Summer() {
     return '';
   }
   const handleUpload = () => {
-    chooseImage({
+    chooseMessageFile({
       count: 4,// 一次最多选4张
-      sizeType: ["original", "compressed"],
-      sourceType: ["album", "camera"],
+      // sizeType: ["original", "compressed"],
+      type:"all",
+      // sourceType: ["album", "camera"],
       success: (res) => {
         console.log(">>>>>choosefile", res);
-        res.tempFilePaths.forEach((item: string, index: number) => {
+        res.tempFiles.forEach((item: Taro.chooseMessageFile.ChooseFile, index: number) => {
           wx.cloud.uploadFile({
             // 文件名规则：时间戳+文件索引
-            cloudPath: Date.now().toString() + '_' + index + '.' + getFileExtension(item), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
-            filePath: item, // 微信本地文件，通过选择图片，聊天文件等接口获取
+            cloudPath: Date.now().toString() + '_' + index + '.' + getFileExtension(item.name), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+            filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
             config: {
               env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
             },
@@ -271,7 +292,7 @@ export default function Summer() {
                 },
                 {
                   label: "否",
-                  value: "2",
+                  value: "0",
                 },
               ]}
               onSelect={(value) => {
@@ -502,7 +523,7 @@ export default function Summer() {
                 },
                 {
                   label: "否",
-                  value: "2",
+                  value: "0",
                 },
               ]}
               onSelect={(value) => {
