@@ -218,11 +218,35 @@ export default function Summer() {
       config: {
         env: "prod-4gcsgqa75da26b30",
       },
-      path: "/api/count",
+      path: "/api/project",
       header: {
         "X-WX-SERVICE": "koa-s36g",
       },
-      method: "GET",
+      method: "POST",
+      data:{
+        "projectName": "aa2",
+        "companyName": "aa",
+        "companyCode": "aa",
+        "projectManagerName": "aa",
+        "projectManagerPhone": "18701999999",
+        "isAuthorized": true,
+        "district": "aa",
+        "projectAddress": "aa",
+        "selectedLocation": "aa",
+        "projectType": "aa",
+        "startTime": "2025-05-01",
+        "endTime": "2025-05-01",
+        "projectContent": "aa",
+        "isSafeSite": "aa",
+        "safeSiteImgsOrPdf": "aa",
+        "materials":[{
+            "materialName":"ccc",
+            "materialCount":3,
+            "materialUnit":"年",
+            "isVocRateLower":true,
+            "materialImgsOrPdf":"aa"
+        }]
+    }
     });
     console.log(">>>>>>", result);
 
