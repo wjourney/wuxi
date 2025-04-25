@@ -40,23 +40,29 @@ const projectTypeList = [
 ];
 // 申报施工项目
 interface Project {
+  // 项目基础信息
   projectName: string; // 项目名称
   companyName: string; // 建设单位名称
   companyCode: string; // 组织机构代码
   projectManagerName: string; // 施工负责人
   projectManagerPhone: string; // 施工负责人电话
-  isAuthorized: string; // 是否受法人授权
+  isAuthorized: number; // 是否受法人授权
+
+  // 作业信息
   district: string; // 行政划分
   projectAddress: string; // 作业地址
-  location: string; // 坐标位置
-  selectedLocation: LocationData; // 选择的坐标位置
+  selectedLocation: LocationData; // 坐标位置
   projectType: string; // 作业类型
   startTime: string; // 计划开始时间
   endTime: string; // 计划结束时间
   projectContent: string; // 具体作业内容
+
+  // 主要原辅材料
   materialList: Material[]; // 主要原辅材料列表
-  img: string;
-  isSafeSite: string; // 是否安全作业场地
+
+  // 是否全电工地
+  isSafeSite: number;
+  safeSiteImgsOrPdf: string[];
 }
 
 interface LocationData {
@@ -70,7 +76,8 @@ interface Material {
   materialName: string; // 主要原辅材料名称
   materialCount: string; // 数量
   materialUnit: string; // 单位
-  isVocRateLower: boolean; // 是否VOC浓度低于20%
+  isVocRateLower: number; // 是否VOC浓度低于10%
+  materialImgsOrPdf?: string[];
 }
 
 export default function Summer() {
@@ -87,18 +94,18 @@ export default function Summer() {
     companyCode: "",
     projectManagerName: "",
     projectManagerPhone: "",
-    isAuthorized: "1", // 默认选择"是"
+    isAuthorized: 1, // 默认选择"是"
     district: "",
     projectAddress: "",
-    location: "",
     selectedLocation: {} as LocationData,
     projectType: "",
     startTime: "",
     endTime: "",
     projectContent: "",
     materialList: [] as Material[],
-    img: "", // 上传图片
-    isSafeSite: "0", // 默认选择"是"
+    // img: "", // 上传图片
+    isSafeSite: 1, // 默认选择"是"
+    safeSiteImgsOrPdf: [],
   });
 
   useLoad(() => {
@@ -155,7 +162,7 @@ export default function Summer() {
           materialName: "",
           materialCount: "",
           materialUnit: "年",
-          isVocRateLower: true,
+          isVocRateLower: 1,
         },
       ],
     });
@@ -564,10 +571,10 @@ export default function Summer() {
               点击上传全电工地证明(图片或者PDF 文件)
             </View>
           </View>
-          <Image
+          {/* <Image
             src={formData.img}
             style={{ width: "50px", height: "50px" }}
-          ></Image>
+          ></Image> */}
         </View>
 
         {/* 提交按钮 */}
