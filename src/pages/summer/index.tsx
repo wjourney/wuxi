@@ -49,7 +49,7 @@ interface Material {
   materialName: string;
   materialCount: string;
   materialUnit: string;
-  isVocRateLower: string;
+  isVocRateLower: boolean;
 }
 
 export default function Summer() {
@@ -134,34 +134,44 @@ export default function Summer() {
           materialName: "",
           materialCount: "",
           materialUnit: "年",
-          vocRate: "是",
+          isVocRateLower: true,
         },
       ],
     });
   };
-
+  // 获取文件后缀
+  const getFileExtension = (filename: string) => {
+    const index = filename.lastIndexOf('.');
+    if (index !== -1 && index < filename.length - 1) {
+      return filename.substring(index + 1).toLowerCase(); // 返回不带点的后缀，如 "pdf"
+    }
+    return '';
+  }
   const handleUpload = () => {
     chooseImage({
-      count: 1,
+      count: 4,// 一次最多选4张
       sizeType: ["original", "compressed"],
       sourceType: ["album", "camera"],
       success: (res) => {
         console.log(">>>>>choosefile", res);
-        wx.cloud.uploadFile({
-          cloudPath: "test11.png", // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
-          filePath: res.tempFilePaths[0], // 微信本地文件，通过选择图片，聊天文件等接口获取
-          config: {
-            env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
-          },
-          success: function (res) {
-            console.log(res);
-            setFormData({
-              ...formData,
-              img: res.fileID,
-            });
-          },
-          fail: console.error,
-        });
+        res.tempFilePaths.forEach((item: string, index: number) => {
+          wx.cloud.uploadFile({
+            // 文件名规则：时间戳+文件索引
+            cloudPath: Date.now().toString() + '_' + index + '.' + getFileExtension(item), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+            filePath: item, // 微信本地文件，通过选择图片，聊天文件等接口获取
+            config: {
+              env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
+            },
+            success: function (res) {
+              console.log(res);
+              setFormData({
+                ...formData,
+                img: res.fileID,
+              });
+            },
+            fail: console.error,
+          });
+        })
       },
     });
   };
@@ -455,7 +465,7 @@ export default function Summer() {
                       },
                       {
                         label: "否",
-                        value: "2",
+                        value: "0",
                       },
                     ]}
                     onSelect={(value) => {
