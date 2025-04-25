@@ -12,12 +12,45 @@
     max-width: 700px;
 }
 
+.material_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .material_item {
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        // background-color: #848080;
+        border: 1px solid #7d7a7a;
+
+        .delete_material {
+            color: #0cc;
+            font-size: 14px;
+            margin-top: 10px;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
 .form_section {
     background-color: #fff;
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.add_material {
+    background-color: #0cc;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 14px;
 }
 
 .section_title {
@@ -32,20 +65,56 @@
 .form_item {
     display: flex;
     align-items: center;
-    padding: 10px 0;
+    // padding: 10px 0;
     border-bottom: 1px solid #eee;
-    height: 40px;
+    height: 48px;
+    gap: 4px;
+    justify-content: space-between;
 
     .label {
         font-size: 14px;
-        color: #666;
+        color: #0b0b0b;
+        height: 100%;
+        display: flex;
+        align-items: center;
     }
 
     .input {
-        flex: 1;
-        // height: 40px;
+        height: 100%;
+        // flex: 1;
+        display: flex;
+        align-items: center;
         font-size: 14px;
         color: #333;
+        // text-align: right !important;
+    }
+
+    .picker {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    // 单选按钮样式
+    radio {
+        transform: scale(0.8);
+        margin-right: 8px;
+    }
+
+    .radio-group {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+
+        label {
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #333;
+        }
     }
 }
 
@@ -55,7 +124,8 @@
     border-bottom: 1px solid #eee;
 }
 
-.agreement_text {
+.agreement_text,
+.agreement_View {
     font-size: 14px;
     color: #666;
     line-height: 1.5;
@@ -111,7 +181,29 @@
     padding: 15px 0;
 }
 
-.footer_text {
+.footer_text,
+.footer_View {
     font-size: 12px;
     color: #999;
+}
+
+.item-content__info-title {
+    color: #333;
+}
+
+.location_container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1;
+
+    .location_text {
+        flex: 1;
+        font-size: 14px;
+    }
+
+    .location_icon {
+        width: 20px !important;
+        height: 20px !important;
+    }
 }

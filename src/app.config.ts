@@ -6,4 +6,10 @@ export default defineAppConfig({
     navigationBarTitleText: "WeChat",
     navigationBarTextStyle: "black",
   },
+  permission: {
+    "scope.userLocation": {
+      desc: "您的位置信息将用于在地图上显示您的当前位置",
+    },
+  },
+  requiredPrivateInfos: ["getLocation", "chooseLocation"],
 });
