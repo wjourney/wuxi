@@ -12,6 +12,20 @@
     max-width: 700px;
 }
 
+.upload_btn {
+    height: 50px;
+    padding: 0 16px;
+    flex: 1;
+    
+    background-color: #0cc;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .material_list {
     display: flex;
     flex-direction: column;
@@ -22,7 +36,8 @@
         display: flex;
         flex-direction: column;
         // background-color: #848080;
-        border: 1px solid #7d7a7a;
+        border: 1px solid #c9c3c3;
+        padding: 8px;
 
         .delete_material {
             color: #0cc;

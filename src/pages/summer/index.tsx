@@ -10,9 +10,9 @@ import {
 import { useLoad, chooseImage } from "@tarojs/taro";
 import { useState } from "react";
 import { Picker } from "@tarojs/components";
-import { AtList, AtListItem } from "taro-ui";
 import Taro from "@tarojs/taro";
 import "./index.scss";
+import Switch from "./Switch";
 
 const districtList = [
   "梁溪区",
@@ -45,6 +45,13 @@ interface LocationData {
   longitude: number;
 }
 
+interface Material {
+  materialName: string;
+  materialCount: string;
+  materialUnit: string;
+  isVocRateLower: string;
+}
+
 export default function Summer() {
   // const [latitude, setLatitude] = useState(0);
   // const [longitude, setLongitude] = useState(0);
@@ -70,18 +77,12 @@ export default function Summer() {
     projectContent: "",
     materialList: [] as Material[],
     img: "", // 上传图片
+    isSafeSite: "1", // 默认选择"是"
   });
 
   useLoad(() => {
     console.log("Page loaded.");
   });
-
-  interface Material {
-    materialName: string;
-    materialCount: string;
-    materialUnit: string;
-    vocRate: string;
-  }
 
   // 处理输入变化
   const handleChange = (field, value) => {
@@ -147,7 +148,7 @@ export default function Summer() {
       success: (res) => {
         console.log(">>>>>choosefile", res);
         wx.cloud.uploadFile({
-          cloudPath: "test.png", // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+          cloudPath: "test11.png", // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
           filePath: res.tempFilePaths[0], // 微信本地文件，通过选择图片，聊天文件等接口获取
           config: {
             env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
@@ -252,17 +253,22 @@ export default function Summer() {
           </View>
           <View className="form_item">
             <View className="label">是否受法人授权：</View>
-            <RadioGroup
-              className="radio-group"
-              onChange={(e) => handleChange("isAuthorized", e.detail.value)}
-            >
-              <Radio value="1" checked={formData.isAuthorized === "1"}>
-                是
-              </Radio>
-              <Radio value="2" checked={formData.isAuthorized === "2"}>
-                否
-              </Radio>
-            </RadioGroup>
+            <Switch
+              options={[
+                {
+                  label: "是",
+                  value: "1",
+                },
+                {
+                  label: "否",
+                  value: "2",
+                },
+              ]}
+              onSelect={(value) => {
+                console.log(">>>>>value", value);
+                handleChange("isAuthorized", value);
+              }}
+            />
           </View>
         </View>
 
@@ -394,17 +400,40 @@ export default function Summer() {
             </View>
           </View>
           <View className="material_list">
-            {formData.materialList?.map((item) => (
+            {formData.materialList?.map((item, indexCount) => (
               <View className="material_item">
                 <View className="form_item">
-                  <View className="label">主要原辅材料：</View>
+                  <View className="label">材料名称：</View>
                   <Input
                     className="input"
                     placeholder="请输入主要原辅材料"
                     value={item.materialName}
                     onInput={(e) =>
-                      handleChange("projectContent", e.detail.value)
+                      setFormData((pre) => ({
+                        ...pre,
+                        materialList: pre.materialList.map((item, index) => {
+                          if (index === indexCount) {
+                            return { ...item, materialName: e.detail.value };
+                          }
+                          return item;
+                        }),
+                      }))
                     }
+                  />
+                  <Switch
+                    options={[
+                      {
+                        label: "年",
+                        value: "year",
+                      },
+                      {
+                        label: "月",
+                        value: "month",
+                      },
+                    ]}
+                    onSelect={(value) => {
+                      handleChange("materialUnit", value);
+                    }}
                   />
                 </View>
                 <View className="form_item">
@@ -415,24 +444,97 @@ export default function Summer() {
                     value={item.materialCount}
                     type="number"
                     onInput={(e) =>
-                      handleChange("projectContent", e.detail.value)
+                      handleChange("materialCount", e.detail.value)
                     }
                   />
+                  <Switch
+                    options={[
+                      {
+                        label: "是",
+                        value: "1",
+                      },
+                      {
+                        label: "否",
+                        value: "2",
+                      },
+                    ]}
+                    onSelect={(value) => {
+                      console.log(">>>>>value", value);
+                      handleChange("isVocRateLower", value);
+                    }}
+                  />
                 </View>
-                <View className="delete_material">删除</View>
+                <View
+                  className="delete_material"
+                  onClick={() => {
+                    setFormData((pre) => ({
+                      ...pre,
+                      materialList: pre.materialList.filter(
+                        (item, index) => index !== indexCount
+                      ),
+                    }));
+                  }}
+                >
+                  删除
+                </View>
               </View>
             ))}
           </View>
         </View>
-
-        <View className="form_item">
-          <View className="label">上传文件</View>
-          <Button onClick={() => handleUpload()}>上传</Button>
+        <View className="form_section">
+          <View className="section_title">是否为全电工地</View>
+          <View className="form_item" style={{ height: 60, gap: 20 }}>
+            <Switch
+              options={[
+                {
+                  label: "是",
+                  value: "1",
+                },
+                {
+                  label: "否",
+                  value: "2",
+                },
+              ]}
+              onSelect={(value) => {
+                handleChange("isSafeSite", value);
+              }}
+            />
+            <View
+              className="upload_btn"
+              // style={{ height: 30, width: 40 }}
+              onClick={() => handleUpload()}
+            >
+              点击上传全电工地证明(图片或者PDF 文件)
+            </View>
+          </View>
           <Image
             src={formData.img}
             style={{ width: "50px", height: "50px" }}
           ></Image>
         </View>
+        {/* <View className="form_section">
+          <View className="section_title"></View>
+          <Switch
+            options={[
+              {
+                label: "是",
+                value: "1",
+              },
+              {
+                label: "否",
+                value: "2",
+              },
+            ]}
+            onSelect={(value) => {
+              handleChange("isSafeSite", value);
+            }}
+          />
+          <Button onClick={() => handleUpload()}>上传</Button>
+          <Image
+            src={formData.img}
+            style={{ width: "50px", height: "50px" }}
+          ></Image>
+        </View> */}
 
         {/* 提交按钮 */}
         <View className="submit_section">
