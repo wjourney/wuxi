@@ -7,7 +7,7 @@ import {
   RadioGroup,
   Text,
 } from "@tarojs/components";
-import { useLoad } from "@tarojs/taro";
+import { useLoad, chooseImage } from "@tarojs/taro";
 import { useState } from "react";
 import { Picker } from "@tarojs/components";
 import { AtList, AtListItem } from "taro-ui";
@@ -69,6 +69,7 @@ export default function Summer() {
     endTime: "",
     projectContent: "",
     materialList: [] as Material[],
+    img: "", // 上传图片
   });
 
   useLoad(() => {
@@ -138,7 +139,61 @@ export default function Summer() {
     });
   };
 
-  const handleSubmit = () => {};
+  const handleUpload = () => {
+    chooseImage({
+      count: 1,
+      sizeType: ["original", "compressed"],
+      sourceType: ["album", "camera"],
+      success: (res) => {
+        console.log(">>>>>choosefile", res);
+        wx.cloud.uploadFile({
+          cloudPath: "test.png", // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+          filePath: res.tempFilePaths[0], // 微信本地文件，通过选择图片，聊天文件等接口获取
+          config: {
+            env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
+          },
+          success: function (res) {
+            console.log(res);
+            setFormData({
+              ...formData,
+              img: res.fileID,
+            });
+          },
+          fail: console.error,
+        });
+      },
+    });
+  };
+
+  // 提交表单
+  const handleSubmit = async () => {
+    const result = await wx.cloud.callContainer({
+      config: {
+        env: "prod-4gcsgqa75da26b30",
+      },
+      path: "/api/count",
+      header: {
+        "X-WX-SERVICE": "koa-s36g",
+      },
+      method: "GET",
+    });
+    console.log(">>>>>>", result);
+
+    // 如下传参
+    wx.cloud
+      .getTempFileURL({
+        fileList: ["cloud://test.png"], // 对象存储文件ID列表，最多50个，从上传文件接口或者控制台获取
+      })
+      .then((res) => {
+        console.log(res.fileList);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    console.log("提交的表单数据：", formData);
+    // 这里添加提交表单的逻辑
+  };
 
   return (
     <View className="summer_page_view">
@@ -368,6 +423,15 @@ export default function Summer() {
               </View>
             ))}
           </View>
+        </View>
+
+        <View className="form_item">
+          <View className="label">上传文件</View>
+          <Button onClick={() => handleUpload()}>上传</Button>
+          <Image
+            src={formData.img}
+            style={{ width: "50px", height: "50px" }}
+          ></Image>
         </View>
 
         {/* 提交按钮 */}
