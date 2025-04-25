@@ -6,6 +6,7 @@ import {
   Radio,
   RadioGroup,
   Text,
+  Textarea,
 } from "@tarojs/components";
 import { useLoad, chooseImage, chooseMessageFile } from "@tarojs/taro";
 import { useState } from "react";
@@ -39,37 +40,37 @@ const projectTypeList = [
 ];
 // 申报施工项目
 interface Project {
-  projectName: string// 项目名称
-  companyName: string// 建设单位名称
-  companyCode: string// 组织机构代码
-  projectManagerName: string// 施工负责人
-  projectManagerPhone: string// 施工负责人电话
-  isAuthorized: string// 是否受法人授权
-  district: string// 行政划分
-  projectAddress: string// 作业地址
-  location: string// 坐标位置
-  selectedLocation: LocationData// 选择的坐标位置
-  projectType: string// 作业类型
-  startTime: string// 计划开始时间
-  endTime: string// 计划结束时间
-  projectContent: string// 具体作业内容
-  materialList: Material[]// 主要原辅材料列表
-  img: string
-  isSafeSite: string// 是否安全作业场地
+  projectName: string; // 项目名称
+  companyName: string; // 建设单位名称
+  companyCode: string; // 组织机构代码
+  projectManagerName: string; // 施工负责人
+  projectManagerPhone: string; // 施工负责人电话
+  isAuthorized: string; // 是否受法人授权
+  district: string; // 行政划分
+  projectAddress: string; // 作业地址
+  location: string; // 坐标位置
+  selectedLocation: LocationData; // 选择的坐标位置
+  projectType: string; // 作业类型
+  startTime: string; // 计划开始时间
+  endTime: string; // 计划结束时间
+  projectContent: string; // 具体作业内容
+  materialList: Material[]; // 主要原辅材料列表
+  img: string;
+  isSafeSite: string; // 是否安全作业场地
 }
 
 interface LocationData {
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
+  name: string; // 选择地点名字
+  address: string; // 选择地点地址
+  latitude: number; // 纬度
+  longitude: number; // 经度
 }
 
 interface Material {
-  materialName: string;// 主要原辅材料名称
-  materialCount: string;// 数量
-  materialUnit: string;// 单位
-  isVocRateLower: boolean;// 是否VOC浓度低于20%
+  materialName: string; // 主要原辅材料名称
+  materialCount: string; // 数量
+  materialUnit: string; // 单位
+  isVocRateLower: boolean; // 是否VOC浓度低于20%
 }
 
 export default function Summer() {
@@ -161,38 +162,45 @@ export default function Summer() {
   };
   // 获取文件后缀
   const getFileExtension = (filename: string) => {
-    const index = filename.lastIndexOf('.');
+    const index = filename.lastIndexOf(".");
     if (index !== -1 && index < filename.length - 1) {
       return filename.substring(index + 1).toLowerCase(); // 返回不带点的后缀，如 "pdf"
     }
-    return '';
-  }
+    return "";
+  };
   const handleUpload = () => {
     chooseMessageFile({
-      count: 4,// 一次最多选4张
+      count: 4, // 一次最多选4张
       // sizeType: ["original", "compressed"],
-      type:"all",
+      type: "all",
       // sourceType: ["album", "camera"],
       success: (res) => {
         console.log(">>>>>choosefile", res);
-        res.tempFiles.forEach((item: Taro.chooseMessageFile.ChooseFile, index: number) => {
-          wx.cloud.uploadFile({
-            // 文件名规则：时间戳+文件索引
-            cloudPath: Date.now().toString() + '_' + index + '.' + getFileExtension(item.name), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
-            filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
-            config: {
-              env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
-            },
-            success: function (res) {
-              console.log(res);
-              setFormData({
-                ...formData,
-                img: res.fileID,
-              });
-            },
-            fail: console.error,
-          });
-        })
+        res.tempFiles.forEach(
+          (item: Taro.chooseMessageFile.ChooseFile, index: number) => {
+            wx.cloud.uploadFile({
+              // 文件名规则：时间戳+文件索引
+              cloudPath:
+                Date.now().toString() +
+                "_" +
+                index +
+                "." +
+                getFileExtension(item.name), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+              filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
+              config: {
+                env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
+              },
+              success: function (res) {
+                console.log(res);
+                setFormData({
+                  ...formData,
+                  img: res.fileID,
+                });
+              },
+              fail: console.error,
+            });
+          }
+        );
       },
     });
   };
@@ -288,15 +296,15 @@ export default function Summer() {
               options={[
                 {
                   label: "是",
-                  value: "1",
+                  value: 1,
                 },
                 {
                   label: "否",
-                  value: "0",
+                  value: 0,
                 },
               ]}
+              defaultValue={1}
               onSelect={(value) => {
-                console.log(">>>>>value", value);
                 handleChange("isAuthorized", value);
               }}
             />
@@ -315,14 +323,13 @@ export default function Summer() {
                 handleChange("district", districtList[e.detail.value]);
               }}
               style={{
-                fontSize: "18px",
-                color: formData.district ? "#000" : "#949292",
+                fontSize: 16,
+                color: formData.district ? "#000" : "#8a8989",
+                flex: 1,
               }}
             >
               <View className="picker">
-                {formData.district
-                  ? `当前选择：${formData.district}`
-                  : "请选择行政区划"}
+                {formData.district ? `${formData.district}` : "请选择行政区划"}
               </View>
             </Picker>
           </View>
@@ -342,7 +349,7 @@ export default function Summer() {
               style={{
                 flex: 1,
                 display: "flex",
-                justifyContent: "space-between",
+                // justifyContent: "space-between",
               }}
               onClick={handleChooseLocation}
             >
@@ -352,14 +359,15 @@ export default function Summer() {
                   color:
                     Object.keys(formData.selectedLocation).length !== 0
                       ? "#000"
-                      : "#949292",
-                  fontSize: "14px",
+                      : "#8a8989",
+                  fontSize: 16,
                 }}
               >
                 {Object.keys(formData.selectedLocation).length !== 0
-                  ? `已选择位置: ${formData.selectedLocation?.name}`
-                  : "请选择具体位置"}
+                  ? `${formData.selectedLocation?.name}`
+                  : "请点击选择具体位置"}
               </View>
+
               <Image
                 className="location_icon"
                 mode="aspectFill"
@@ -377,14 +385,15 @@ export default function Summer() {
                 handleChange("projectType", projectTypeList[e.detail.value]);
               }}
               style={{
-                fontSize: "18px",
-                color: formData.projectType ? "#000" : "#949292",
+                fontSize: 16,
+                color: formData.projectType ? "#000" : "#8a8989",
+                flex: 1,
               }}
             >
               <View className="picker">
                 {formData.projectType
-                  ? `当前选择：${formData.projectType}`
-                  : "请选择作业类型"}
+                  ? `${formData.projectType}`
+                  : "请点击选择作业类型"}
               </View>
             </Picker>
           </View>
@@ -408,11 +417,21 @@ export default function Summer() {
               </View>
             </Picker> */}
           </View>
-          <View className="form_item">
-            <View className="label">具体作业内容：</View>
-            <Input
+          <View
+            className="form_item"
+            style={{
+              flexDirection: "column",
+              height: 100,
+              alignItems: "start ",
+              borderBottom: "none",
+            }}
+          >
+            <View className="label" style={{ height: 40 }}>
+              具体作业内容：
+            </View>
+            <Textarea
               className="input"
-              placeholder="请输入作业内容"
+              placeholder="请输入具体作业内容"
               value={formData.projectContent}
               onInput={(e) => handleChange("projectContent", e.detail.value)}
             />
@@ -451,6 +470,18 @@ export default function Summer() {
                       }))
                     }
                   />
+                </View>
+                <View className="form_item">
+                  <View className="label">数量和单位：</View>
+                  <Input
+                    className="input"
+                    placeholder="请输入"
+                    value={item.materialCount}
+                    type="number"
+                    onInput={(e) =>
+                      handleChange("materialCount", e.detail.value)
+                    }
+                  />
                   <Switch
                     options={[
                       {
@@ -468,16 +499,7 @@ export default function Summer() {
                   />
                 </View>
                 <View className="form_item">
-                  <View className="label">数量和单位：</View>
-                  <Input
-                    className="input"
-                    placeholder="请输入"
-                    value={item.materialCount}
-                    type="number"
-                    onInput={(e) =>
-                      handleChange("materialCount", e.detail.value)
-                    }
-                  />
+                  <View className="label">VOCs容量是否低于10%</View>
                   <Switch
                     options={[
                       {
@@ -494,6 +516,10 @@ export default function Summer() {
                       handleChange("isVocRateLower", value);
                     }}
                   />
+                </View>
+                <View className="form_item">
+                  <View className="label">低 VOCs 原辅材料证明：</View>
+                  <View className="upload_btn">请点击上传图片/PDF 文件</View>
                 </View>
                 <View
                   className="delete_material"
@@ -543,42 +569,13 @@ export default function Summer() {
             style={{ width: "50px", height: "50px" }}
           ></Image>
         </View>
-        {/* <View className="form_section">
-          <View className="section_title"></View>
-          <Switch
-            options={[
-              {
-                label: "是",
-                value: "1",
-              },
-              {
-                label: "否",
-                value: "2",
-              },
-            ]}
-            onSelect={(value) => {
-              handleChange("isSafeSite", value);
-            }}
-          />
-          <Button onClick={() => handleUpload()}>上传</Button>
-          <Image
-            src={formData.img}
-            style={{ width: "50px", height: "50px" }}
-          ></Image>
-        </View> */}
 
         {/* 提交按钮 */}
-        <View className="submit_section">
-          <Button className="submit_btn" onClick={handleSubmit}>
-            确认上传
-          </Button>
-        </View>
-
-        <View className="form_footer">
-          <View className="footer_View">
-            请确保所有信息真实有效，我们将保护您的隐私
-          </View>
-        </View>
+      </View>
+      <View className="submit_section">
+        <Button className="submit_btn" onClick={handleSubmit}>
+          确认上传
+        </Button>
       </View>
     </View>
   );

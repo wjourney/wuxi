@@ -5,6 +5,8 @@
     align-items: center;
     background-color: #f5f5f5;
     padding: 20px 0;
+    padding-bottom: calc(constant(safe-area-inset-bottom) + 80px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
 }
 
 .form_container {
@@ -16,7 +18,7 @@
     height: 50px;
     padding: 0 16px;
     flex: 1;
-    
+
     background-color: #0cc;
     color: #fff;
     border-radius: 4px;
@@ -35,7 +37,6 @@
         border-radius: 10px;
         display: flex;
         flex-direction: column;
-        // background-color: #848080;
         border: 1px solid #c9c3c3;
         padding: 8px;
 
@@ -65,11 +66,11 @@
     color: #fff;
     padding: 4px 8px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .section_title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
     border-left: 4px solid #0cc;
@@ -87,7 +88,7 @@
     justify-content: space-between;
 
     .label {
-        font-size: 14px;
+        font-size: 16px;
         color: #0b0b0b;
         height: 100%;
         display: flex;
@@ -96,43 +97,15 @@
 
     .input {
         height: 100%;
-        // flex: 1;
+        flex: 1;
         display: flex;
         align-items: center;
-        font-size: 14px;
-        color: #333;
+        font-size: 16px;
+        text-align: justify;
         // text-align: right !important;
     }
 
-    .picker {
-        flex: 1;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-    }
-
-    // 单选按钮样式
-    radio {
-        transform: scale(0.8);
-        margin-right: 8px;
-    }
-
-    .radio-group {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-
-        label {
-            margin-left: 20px;
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            color: #333;
-        }
-    }
 }
-
 
 .agreement {
     padding: 12px 0;
@@ -141,7 +114,7 @@
 
 .agreement_text,
 .agreement_View {
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
     line-height: 1.5;
 }
@@ -156,7 +129,7 @@
     height: 36px;
     line-height: 36px;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
     background-color: #f5f5f5;
     border-radius: 4px;
@@ -170,7 +143,7 @@
 
 .agreement_value {
     color: #0cc;
-    font-size: 14px;
+    font-size: 16px;
     margin-top: 5px;
 }
 
@@ -178,6 +151,12 @@
     padding: 20px 0;
     display: flex;
     justify-content: center;
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    background-color: #fff;
+    height: 60px;
+    z-index: 1000;
 }
 
 .submit_btn {
@@ -191,19 +170,16 @@
     border-radius: 22px;
 }
 
-.form_footer {
-    text-align: center;
-    padding: 15px 0;
-}
-
-.footer_text,
-.footer_View {
-    font-size: 12px;
-    color: #999;
-}
-
 .item-content__info-title {
     color: #333;
+}
+
+textarea {
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
+    height: 40px;
 }
 
 .location_container {
@@ -214,7 +190,7 @@
 
     .location_text {
         flex: 1;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .location_icon {

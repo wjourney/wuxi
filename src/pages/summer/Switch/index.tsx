@@ -4,13 +4,13 @@ import "./index.scss";
 
 interface Option {
   label: string;
-  value: string;
+  value: string | number;
 }
 
 interface Props {
   options: Option[];
-  onSelect?: (value: string) => void;
-  defaultValue?: string;
+  onSelect?: (value: string | number) => void;
+  defaultValue?: string | number;
 }
 
 export default function Switch({
