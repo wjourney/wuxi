@@ -581,6 +581,7 @@ export default function Summer() {
             <Input
               className="input"
               placeholder="请输入正确的手机号码"
+              type="number"
               value={formData.projectManagerPhone}
               onInput={(e) =>
                 handleChange("projectManagerPhone", e.detail.value)
