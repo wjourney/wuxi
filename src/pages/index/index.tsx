@@ -1,12 +1,15 @@
 import { View, Text, Image } from "@tarojs/components";
-import { useLoad } from "@tarojs/taro";
+import { useLoad, useShareAppMessage } from "@tarojs/taro";
 import "./index.scss";
 import Taro from "@tarojs/taro";
 import { useEffect } from "react";
 
 export default function Index() {
-  useLoad(() => {
-    console.log("Page loaded.");
+  useShareAppMessage(() => {
+    return {
+      title: "无锡市施工项目申报平台",
+      path: "/pages/index/index",
+    };
   });
 
   const textfn = async () => {

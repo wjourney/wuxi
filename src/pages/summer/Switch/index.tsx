@@ -22,19 +22,16 @@ export default function Switch({
     defaultValue || options[0]?.value
   );
 
-  useEffect(() => {
-    if (activeValue && onSelect) {
-      onSelect(activeValue);
-    }
-  }, [activeValue]);
-
   return (
     <View className="tab-container">
       {options.map((option) => (
         <View
           key={option.value}
           className={`tab-item ${activeValue === option.value ? "active" : ""}`}
-          onClick={() => setActiveValue(option.value)}
+          onClick={() => {
+            setActiveValue(option.value);
+            onSelect?.(option.value);
+          }}
         >
           {option.label}
         </View>
