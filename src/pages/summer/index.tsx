@@ -991,12 +991,12 @@ export default function Summer() {
                 },
               ]}
               onSelect={(value) => {
-                handleChange("isSafeSite", value);
-                if (value === 1) {
-                  handleChange("emissionStage", "");
-                } else {
-                  handleChange("safeSiteImgsOrPdf", []);
-                }
+                setFormData((prev) => ({
+                  ...prev,
+                  isSafeSite: value as number,
+                  emissionStage: value === 1 ? "" : prev.emissionStage,
+                  safeSiteImgsOrPdf: value === 0 ? [] : prev.safeSiteImgsOrPdf,
+                }));
               }}
             />
             {formData.isSafeSite === 1 && (
