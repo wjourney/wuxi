@@ -508,7 +508,7 @@ export default function Summer() {
             title: "提交成功",
             icon: "success",
           });
-          setFormData(initFormdata);
+          // setFormData(initFormdata);
           // 可以在这里添加提交成功后的逻辑，比如返回列表页
         } else {
           Taro.showToast({
