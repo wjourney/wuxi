@@ -25,7 +25,7 @@ import CustomImage from "./CustomImage";
 // 获取全局wx对象
 const wx = Taro.getEnv() === Taro.ENV_TYPE.WEAPP ? Taro : null;
 const prompt =
-  "🔔请先将图片/PDF文件发送到微信聊天(发给好友、自己或者文件助手)，再选择该聊天，去聊天记录中勾选图片/PDF文件上传";
+  "🔔请先将图片/PDF文件发送到微信聊天(发给好友、自己或文件助手)，再选择该聊天，去聊天记录中勾选图片/PDF文件上传";
 
 const districtList = [
   "梁溪区",
