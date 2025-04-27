@@ -513,21 +513,21 @@ export default function Summer() {
         } else {
           Taro.showToast({
             title: "提交失败，请稍后重试",
-            icon: "success",
+            icon: "error",
           });
         }
       } else {
         console.error("wx对象不存在，无法调用云函数");
         Taro.showToast({
-          title: "系统错误，请稍后重试",
-          icon: "none",
+          title: "提交失败，请稍后重试",
+          icon: "error",
         });
       }
     } catch (error) {
       console.error("提交表单时发生错误：", error);
       Taro.showToast({
         title: "提交失败，请稍后重试",
-        icon: "none",
+        icon: "error",
       });
     }
   };
