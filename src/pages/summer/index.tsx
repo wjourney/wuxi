@@ -7,6 +7,7 @@ import {
   RadioGroup,
   Text,
   Textarea,
+  CoverView,
 } from "@tarojs/components";
 import {
   useLoad,
@@ -586,7 +587,7 @@ export default function Summer() {
               }
             />
           </View>
-          <View className="form_item">
+          <View className="form_item" style={{ borderBottom: "none" }}>
             <View className="label">是否受法人授权：</View>
             <Switch
               options={[
@@ -991,6 +992,11 @@ export default function Summer() {
               ]}
               onSelect={(value) => {
                 handleChange("isSafeSite", value);
+                if (value === 1) {
+                  handleChange("emissionStage", "");
+                } else {
+                  handleChange("safeSiteImgsOrPdf", []);
+                }
               }}
             />
             {formData.isSafeSite === 1 && (
@@ -1061,14 +1067,14 @@ export default function Summer() {
             />
           </View>
         </View>
-
-        {/* 提交按钮 */}
       </View>
-      <View className="submit_section">
+
+      {/* 提交按钮 */}
+      <CoverView className="submit_section">
         <Button className="submit_btn" onClick={handleSubmit}>
           确认上传
         </Button>
-      </View>
+      </CoverView>
     </View>
   );
 }
