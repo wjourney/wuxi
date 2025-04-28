@@ -90,7 +90,8 @@ interface LocationData {
 
 interface File {
   name: string; // 文件名
-  url: string; // 文件路径
+  fileID: string; // 文件路径
+  nameStore: string;// oss存储名称
 }
 
 interface Material {
@@ -196,6 +197,36 @@ export default function Summer() {
     }
     return "";
   };
+  // 上传文件
+  const handleUploadFile = (item:any,index:number, callback: (err:Error|unknown, res:any, file_new_name:string)=>void) => {
+    // 用于获取http公开链接
+    const file_new_name = Date.now().toString() +
+    "_" +
+    index +
+    "." +
+    getFileExtension(item.name);
+    if (!wx) {
+      Taro.showToast({
+        title: "系统错误，请稍后重试",
+        icon: "none",
+      });
+      return;
+    }
+    wx.cloud.uploadFile({
+      // 文件名规则：时间戳+文件索引
+      cloudPath: file_new_name, // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
+      filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
+      config: {
+        env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
+      },
+      success: function (res) {
+        callback(null, res, file_new_name);
+      },
+      fail: function (err) {
+        callback(err, null, file_new_name);
+      },
+    });
+  }
 
   const handleUploadMaterialImagesOrPdf = (materialId: string) => {
     // chooseMessageFile({
@@ -204,49 +235,36 @@ export default function Summer() {
       type: "all",
       success: (res) => {
         console.log(">>>>>choosefile", res);
-        if (!wx) {
-          Taro.showToast({
-            title: "系统错误，请稍后重试",
-            icon: "none",
-          });
-          return;
-        }
         res.tempFiles.forEach(
           (item: Taro.chooseMessageFile.ChooseFile, index: number) => {
-            wx.cloud.uploadFile({
-              // 文件名规则：时间戳+文件索引
-              cloudPath:
-                Date.now().toString() +
-                "_" +
-                index +
-                "." +
-                getFileExtension(item.name), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
-              filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
-              config: {
-                env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
-              },
-              success: function (res) {
-                setFormData((pre) => ({
-                  ...pre,
-                  materialList: pre.materialList.map((item1) => {
-                    if (item1.id === materialId) {
-                      return {
-                        ...item1,
-                        materialImgsOrPdf: [
-                          ...(item1.materialImgsOrPdf || []),
-                          {
-                            name: item.name,
-                            url: res.fileID,
-                          },
-                        ],
-                      };
-                    }
-                    return item1;
-                  }),
-                }));
-              },
-              fail: console.error,
-            });
+            handleUploadFile(item, index, (err, res, file_new_name) => {
+              if (err) {
+                Taro.showToast({
+                  title: "上传失败",
+                  icon: "none",
+                });
+                return;
+              }
+              setFormData((pre) => ({
+                ...pre,
+                materialList: pre.materialList.map((item1) => {
+                  if (item1.id === materialId) {
+                    return {
+                      ...item1,
+                      materialImgsOrPdf: [
+                        ...(item1.materialImgsOrPdf || []),
+                        {
+                          name: item.name,
+                          fileID: res.fileID,
+                          nameStore: file_new_name
+                        },
+                      ],
+                    };
+                  }
+                  return item1;
+                }),
+              }));
+            })
           }
         );
       },
@@ -259,28 +277,16 @@ export default function Summer() {
       type: "all",
       success: (res) => {
         console.log(">>>>>choosefile", res);
-        if (!wx) {
-          Taro.showToast({
-            title: "系统错误，请稍后重试",
-            icon: "none",
-          });
-          return;
-        }
         res.tempFiles.forEach(
           (item: Taro.chooseMessageFile.ChooseFile, index: number) => {
-            wx.cloud.uploadFile({
-              // 文件名规则：时间戳+文件索引
-              cloudPath:
-                Date.now().toString() +
-                "_" +
-                index +
-                "." +
-                getFileExtension(item.name), // 对象存储路径，根路径直接填文件名，文件夹例子 test/文件名，不要 / 开头
-              filePath: item.path, // 微信本地文件，通过选择图片，聊天文件等接口获取
-              config: {
-                env: "prod-4gcsgqa75da26b30", // 微信云托管环境ID
-              },
-              success: function (res) {
+            handleUploadFile(item, index, (err, res, file_new_name) => {
+                if (err) {
+                    Taro.showToast({
+                        title: "上传失败",
+                        icon: "none",
+                    });
+                    return;
+                }
                 console.log(res);
                 setFormData((pre) => ({
                   ...pre,
@@ -288,13 +294,12 @@ export default function Summer() {
                     ...(pre.safeSiteImgsOrPdf || []),
                     {
                       name: item.name,
-                      url: res.fileID,
+                      fileID: res.fileID,
+                      nameStore: file_new_name
                     },
                   ],
                 }));
-              },
-              fail: console.error,
-            });
+            })
           }
         );
       },
@@ -303,7 +308,7 @@ export default function Summer() {
 
   // 提交表单
   const handleSubmit = async () => {
-    console.log(">>>>>formData", formData);
+    console.log(">>>>>formData", JSON.stringify(formData));
     // 表单校验
     // 1. 检查项目基础信息
     if (!formData.projectName) {
@@ -920,7 +925,7 @@ export default function Summer() {
                   <View className="material_item_imgs">
                     {item.materialImgsOrPdf?.map((img: File, imgIndex) => (
                       <CustomImage
-                        key={`${item.id}-${imgIndex}-${img.url}`}
+                        key={`${item.id}-${imgIndex}-${img.fileID}`}
                         file={img}
                         deleteFn={(url) => {
                           setFormData((pre) => {
@@ -928,7 +933,7 @@ export default function Summer() {
                             const newList = pre.materialList.map((item1) => {
                               if (item1.id === item.id) {
                                 const newFiles = item1.materialImgsOrPdf.filter(
-                                  (item2) => item2.url !== url
+                                  (item2) => item2.fileID !== url
                                 );
                                 console.log("过滤后的文件列表:", newFiles);
                                 return {
@@ -1029,11 +1034,11 @@ export default function Summer() {
                       setFormData((pre) => ({
                         ...pre,
                         safeSiteImgsOrPdf: pre.safeSiteImgsOrPdf.filter(
-                          (item) => item.url !== url
+                          (item) => item.fileID !== url
                         ),
                       }));
                     }}
-                    key={`${imgIndex}-${img.url}`}
+                    key={`${imgIndex}-${img.fileID}`}
                     file={img}
                   />
                 ))}
