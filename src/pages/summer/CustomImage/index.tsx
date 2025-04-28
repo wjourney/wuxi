@@ -4,7 +4,7 @@ import fallbackIcon from "@/assets/svg/doc.svg"; // 本地占位图
 import "./index.scss";
 
 const CustomImage = ({ file, deleteFn }) => {
-  const [imgSrc, setImgSrc] = useState(file.url); // 展示的图片
+  const [imgSrc, setImgSrc] = useState(file.fileID); // 展示的图片
 
   // 分离文件名和后缀
   const fileName = file.name.split(".")?.[0];
@@ -13,7 +13,7 @@ const CustomImage = ({ file, deleteFn }) => {
   const handleDelete = (e) => {
     // 阻止事件冒泡
     e.stopPropagation();
-    deleteFn && deleteFn(file.url);
+    deleteFn && deleteFn(file.fileID);
   };
 
   return (
@@ -22,7 +22,7 @@ const CustomImage = ({ file, deleteFn }) => {
         className="custom-image-img"
         src={imgSrc}
         mode="aspectFill"
-        preview={file.url}
+        preview={file.fileID}
         onError={() => {
           setImgSrc(fallbackIcon); // 图片加载失败时替换
         }}
@@ -35,7 +35,7 @@ const CustomImage = ({ file, deleteFn }) => {
         mode="aspectFill"
         src={require("@/assets/svg/delete.svg")}
         className="delete-icon"
-        data-url={file.url}
+        data-url={file.fileID}
         onClick={handleDelete}
       />
     </View>
