@@ -434,7 +434,7 @@ export default function Summer() {
 
   // 提交表单
   const handleSubmit = async () => {
-    console.log(">>>>>formData", JSON.stringify(formData));
+    console.log(">>>>>formData", formData, JSON.stringify(formData));
     // 表单校验
     // 1. 检查项目基础信息
     if (!formData.projectName) {
@@ -585,7 +585,19 @@ export default function Summer() {
         material.lowerVocMaterialImgsOrPdf.length === 0
       ) {
         Taro.showToast({
-          title: `请上传第${i + 1}个材料的低VOCs证明文件`,
+          title: `请上传第${i + 1}个原辅材料的低VOCs证明文件`,
+          icon: "none",
+        });
+        return;
+      }
+
+      // 不是低voc时候，检查材料是否上传了证明文件
+      if (
+        material.isVocRateLower === 0 &&
+        material.vocSupportImgsOrPdf.length === 0
+      ) {
+        Taro.showToast({
+          title: `请上传第${i + 1}个原辅材料的VOCs证明文件`,
           icon: "none",
         });
         return;
@@ -728,21 +740,21 @@ export default function Summer() {
           // 可以在这里添加提交成功后的逻辑，比如返回列表页
         } else {
           Taro.showToast({
-            title: "提交失败，请稍后重试",
+            title: "提交失败",
             icon: "error",
           });
         }
       } else {
         console.error("wx对象不存在，无法调用云函数");
         Taro.showToast({
-          title: "提交失败，请稍后重试",
+          title: "提交失败",
           icon: "error",
         });
       }
     } catch (error) {
       console.error("提交表单时发生错误：", error);
       Taro.showToast({
-        title: "提交失败，请稍后重试",
+        title: "提交失败",
         icon: "error",
       });
     }
@@ -863,7 +875,6 @@ export default function Summer() {
               style={{
                 flex: 1,
                 display: "flex",
-                // justifyContent: "space-between",
               }}
               onClick={handleChooseLocation}
             >
