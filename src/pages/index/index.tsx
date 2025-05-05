@@ -12,24 +12,8 @@ export default function Index() {
     };
   });
 
-  const textfn = async () => {
-    wx.cloud.callContainer({
-      config: {
-        env: "prod-4gcsgqa75da26b30",
-      },
-      path: "/api/count",
-      header: {
-        "X-WX-SERVICE": "koa-s36g",
-      },
-      method: "POST",
-      data: {
-        action: "inc",
-      },
-    });
-  };
-
   useEffect(() => {
-    textfn();
+
   }, []);
 
   return (
