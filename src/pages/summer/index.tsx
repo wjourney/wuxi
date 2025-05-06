@@ -138,7 +138,7 @@ interface Project {
 interface TransportVehicle {
   id: string; // 区分唯一id
   vehicleName: string; // 车辆名称
-  vehicleCount: number; // 车辆数量
+  vehicleCount: string; // 车辆数量
   vehicleOilSource: string; // 车辆加油来源
   vehicleEmissionStandard: string; // 车辆排放标准
   vehicleIsRegistered: number; // 车辆是否备案
@@ -149,7 +149,7 @@ interface TransportVehicle {
 interface NonRoadMobileEquipment {
   id: string; // 区分唯一id
   equipmentName: string; // 非道路移动机械名称
-  equipmentCount: number; // 非道路移动机械数量
+  equipmentCount: string; // 非道路移动机械数量
   equipmentOilSource: string; // 非道路移动机械加油来源
   equipmentEmissionStandard: string; // 非道路移动机械排放标准
   equipmentIsRegistered: number; // 非道路移动机械是否备案
@@ -171,7 +171,7 @@ interface File {
 
 interface Material {
   materialName: string; // 主要原辅材料名称
-  materialCount: number; // 数量
+  materialCount: string; // 数量
   materialUnit: string; // 单位
   isVocRateLower: number; // 是否VOC浓度低于10%
   id: string; // 区分唯一id
@@ -260,7 +260,7 @@ export default function Summer() {
         ...formData.materialList,
         {
           materialName: "",
-          materialCount: 0,
+          materialCount: "0",
           materialUnit: "year",
           isVocRateLower: 1,
           lowerVocMaterialImgsOrPdf: [],
@@ -280,7 +280,7 @@ export default function Summer() {
         {
           id: Date.now().toString(),
           vehicleName: "",
-          vehicleCount: 0,
+          vehicleCount: '0',
           vehicleOilSource: "",
           vehicleEmissionStandard: "",
           vehicleIsRegistered: 1,
@@ -299,7 +299,7 @@ export default function Summer() {
         {
           id: Date.now().toString(),
           equipmentName: "",
-          equipmentCount: 0,
+          equipmentCount: '0',
           equipmentOilSource: "",
           equipmentEmissionStandard: "",
           equipmentIsRegistered: 1,
@@ -569,7 +569,6 @@ export default function Summer() {
         });
         return;
       }
-
       if (!material.materialCount) {
         Taro.showToast({
           title: `请填写第${i + 1}个材料的数量`,
@@ -634,7 +633,7 @@ export default function Summer() {
           return;
         }
 
-        if (!vehicle.vehicleCount || vehicle.vehicleCount <= 0) {
+        if (!vehicle.vehicleCount) {
           Taro.showToast({
             title: `请填写第${i + 1}辆运输车辆的数量`,
             icon: "none",
@@ -679,7 +678,7 @@ export default function Summer() {
           return;
         }
 
-        if (!equipment.equipmentCount || equipment.equipmentCount <= 0) {
+        if (!equipment.equipmentCount) {
           Taro.showToast({
             title: `请填写第${i + 1}台非道路移动机械的数量`,
             icon: "none",
@@ -734,6 +733,9 @@ export default function Summer() {
           Taro.showToast({
             title: "提交成功",
             icon: "success",
+          });
+          Taro.navigateTo({
+            url: "/pages/index/index",
           });
           // setFormData(initFormdata);
           // 可以在这里添加提交成功后的逻辑，比如返回列表页
@@ -1054,7 +1056,6 @@ export default function Summer() {
                   <Input
                     className="input"
                     placeholder="请输入"
-                    type="number"
                     onInput={(e) =>
                       setFormData((pre) => ({
                         ...pre,
@@ -1062,7 +1063,7 @@ export default function Summer() {
                           if (item1.id === item.id) {
                             return {
                               ...item1,
-                              materialCount: Number(e.detail.value),
+                              materialCount: e.detail.value,
                             };
                           }
                           return item1;
@@ -1259,7 +1260,7 @@ export default function Summer() {
                       {
                         id: Date.now().toString(),
                         vehicleName: "",
-                        vehicleCount: 0,
+                        vehicleCount: '0',
                         vehicleOilSource: "",
                         vehicleEmissionStandard: "",
                         vehicleIsRegistered: 1,
@@ -1271,7 +1272,7 @@ export default function Summer() {
                       {
                         id: Date.now().toString(),
                         equipmentName: "",
-                        equipmentCount: 0,
+                        equipmentCount: '0',
                         equipmentOilSource: "",
                         equipmentEmissionStandard: "",
                         equipmentIsRegistered: 1,
@@ -1387,7 +1388,6 @@ export default function Summer() {
                     <Input
                       className="input"
                       placeholder="请输入"
-                      type="number"
                       onInput={(e) =>
                         setFormData((pre) => ({
                           ...pre,
@@ -1396,7 +1396,7 @@ export default function Summer() {
                               if (item1.id === item.id) {
                                 return {
                                   ...item1,
-                                  vehicleCount: Number(e.detail.value),
+                                  vehicleCount: e.detail.value,
                                 };
                               }
                               return item1;
@@ -1657,7 +1657,6 @@ export default function Summer() {
                       <Input
                         className="input"
                         placeholder="请输入"
-                        type="number"
                         onInput={(e) =>
                           setFormData((pre) => ({
                             ...pre,
@@ -1666,7 +1665,7 @@ export default function Summer() {
                                 if (item1.id === item.id) {
                                   return {
                                     ...item1,
-                                    equipmentCount: Number(e.detail.value),
+                                    equipmentCount: e.detail.value,
                                   };
                                 }
                                 return item1;
