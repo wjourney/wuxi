@@ -8,6 +8,8 @@ import {
   Text,
   Textarea,
   CoverView,
+  Checkbox,
+  CheckboxGroup,
 } from "@tarojs/components";
 import {
   useLoad,
@@ -50,52 +52,11 @@ const projectTypeList = [
   "大中型装修",
 ];
 
-// 非道路移动机械排放标准
-const nonRoadMobileEquipmentEmissionStandardList = [
-  "国一",
-  "国二",
-  "国三",
-  "国四",
-  "纯电",
-  "未知",
-];
-
-// 车辆排放标准
-const vehicleEmissionStandardList = [
-  "国一",
-  "国二",
-  "国三",
-  "国四",
-  "国五",
-  "国六",
-  "纯电",
-  "未知",
-];
-
-// 运输车辆类型
-const transportVehicleTypeList = ["轻型货车", "中型货车", "重型货车"];
-
-// 加油来源
-const oilSourceList = [
-  "汽油",
-  "柴油",
-  "电动",
-  "LPG",
-  "天然气",
-  "油气混合动力",
-  "油电混合动力",
-];
-
-// 非道路移动机械类目
-const nonRoadMobileEquipmentCategoryList = [
-  "挖掘机",
-  "推土机",
-  "装载机",
-  "压路机",
-  "摊铺机",
-  "平地机",
-  "叉车",
-  "其他",
+const vocPreventionMeasuresList = [
+  "使用水性/低VOCs原辅材料",
+  "涉VOCs原辅材料密闭存储",
+  "涉VOCs原辅材料密闭转运",
+  "涉VOCs原辅材料非取用状态加盖密闭",
 ];
 
 // 申报施工项目
@@ -103,10 +64,10 @@ interface Project {
   // 项目基础信息
   projectName: string; // 项目名称
   companyName: string; // 建设单位名称
-  companyCode: string; // 组织机构代码
+  constructionCompanyName: string; // 施工单位名称
+  companyCode: string; // 施工单位组织机构代码
   projectManagerName: string; // 施工负责人
   projectManagerPhone: string; // 施工负责人电话
-  isAuthorized: number; // 是否受法人授权
 
   // 作业信息
   district: string; // 行政划分
@@ -120,40 +81,8 @@ interface Project {
   // 主要原辅材料
   materialList: Material[]; // 主要原辅材料列表
 
-  // 是否全电工地
-  isSafeSite: number;
-  safeSiteImgsOrPdf: File[];
-
-  // 运输车辆
-  transportVehicleList: TransportVehicle[];
-
-  // 非道路移动机械设备
-  nonRoadMobileEquipmentList: NonRoadMobileEquipment[];
-
   // 挥发性有机物防治措施
-  vocPreventionMeasures: string;
-}
-
-// 运输车辆
-interface TransportVehicle {
-  id: string; // 区分唯一id
-  vehicleName: string; // 车辆名称
-  vehicleCount: string; // 车辆数量
-  vehicleOilSource: string; // 车辆加油来源
-  vehicleEmissionStandard: string; // 车辆排放标准
-  vehicleIsRegistered: number; // 车辆是否备案
-  vehicleIsDustCover: number; // 车辆有无防尘罩
-}
-
-// 非道路移动机械设备
-interface NonRoadMobileEquipment {
-  id: string; // 区分唯一id
-  equipmentName: string; // 非道路移动机械名称
-  equipmentCount: string; // 非道路移动机械数量
-  equipmentOilSource: string; // 非道路移动机械加油来源
-  equipmentEmissionStandard: string; // 非道路移动机械排放标准
-  equipmentIsRegistered: number; // 非道路移动机械是否备案
-  equipmentIsDustCover: number; // 非道路移动机械有无防尘罩
+  vocPreventionMeasures: string[];
 }
 
 interface LocationData {
@@ -172,7 +101,6 @@ interface File {
 interface Material {
   materialName: string; // 主要原辅材料名称
   materialCount: string; // 数量
-  materialUnit: string; // 单位
   isVocRateLower: number; // 是否VOC浓度低于10%
   id: string; // 区分唯一id
 
@@ -192,9 +120,9 @@ export default function Summer() {
     projectName: "",
     companyName: "",
     companyCode: "",
+    constructionCompanyName: "",
     projectManagerName: "",
     projectManagerPhone: "",
-    isAuthorized: 1, // 默认选择"是"
     district: "",
     projectAddress: "",
     selectedLocation: {} as LocationData,
@@ -203,12 +131,7 @@ export default function Summer() {
     endTime: "",
     projectContent: "",
     materialList: [] as Material[],
-    isSafeSite: 1, // 默认选择"是"
-    safeSiteImgsOrPdf: [],
-    // emissionStage: "",
-    vocPreventionMeasures: "",
-    transportVehicleList: [] as TransportVehicle[],
-    nonRoadMobileEquipmentList: [] as NonRoadMobileEquipment[],
+    vocPreventionMeasures: [],
   };
 
   // 表单数据状态
@@ -261,49 +184,10 @@ export default function Summer() {
         {
           materialName: "",
           materialCount: "0",
-          materialUnit: "year",
           isVocRateLower: 1,
           lowerVocMaterialImgsOrPdf: [],
           vocSupportImgsOrPdf: [],
           id: Date.now().toString(),
-        },
-      ],
-    });
-  };
-
-  // 添加运输车辆
-  const handleAddTransportVehicle = () => {
-    setFormData({
-      ...formData,
-      transportVehicleList: [
-        ...formData.transportVehicleList,
-        {
-          id: Date.now().toString(),
-          vehicleName: "",
-          vehicleCount: '0',
-          vehicleOilSource: "",
-          vehicleEmissionStandard: "",
-          vehicleIsRegistered: 1,
-          vehicleIsDustCover: 1,
-        },
-      ],
-    });
-  };
-
-  // 添加非道路移动机械
-  const handleAddNonRoadMobileEquipment = () => {
-    setFormData({
-      ...formData,
-      nonRoadMobileEquipmentList: [
-        ...formData.nonRoadMobileEquipmentList,
-        {
-          id: Date.now().toString(),
-          equipmentName: "",
-          equipmentCount: '0',
-          equipmentOilSource: "",
-          equipmentEmissionStandard: "",
-          equipmentIsRegistered: 1,
-          equipmentIsDustCover: 1,
         },
       ],
     });
@@ -396,38 +280,46 @@ export default function Summer() {
     });
   };
 
-  const handleElectricSiteUpload = () => {
-    chooseMessageFile({
-      count: 10, // 一次最多选4张
-      type: "all",
-      success: (res) => {
-        console.log(">>>>>choosefile", res);
-        res.tempFiles.forEach(
-          (item: Taro.chooseMessageFile.ChooseFile, index: number) => {
-            handleUploadFile(item, index, (err, res, file_new_name) => {
-              if (err) {
-                Taro.showToast({
-                  title: "上传失败",
-                  icon: "none",
-                });
-                return;
-              }
-              console.log(res);
-              setFormData((pre) => ({
-                ...pre,
-                safeSiteImgsOrPdf: [
-                  ...(pre.safeSiteImgsOrPdf || []),
-                  {
-                    name: item.name,
-                    fileID: res.fileID,
-                    nameStore: file_new_name,
-                  },
-                ],
-              }));
-            });
-          }
-        );
-      },
+  // const handleElectricSiteUpload = () => {
+  //   chooseMessageFile({
+  //     count: 10, // 一次最多选4张
+  //     type: "all",
+  //     success: (res) => {
+  //       console.log(">>>>>choosefile", res);
+  //       res.tempFiles.forEach(
+  //         (item: Taro.chooseMessageFile.ChooseFile, index: number) => {
+  //           handleUploadFile(item, index, (err, res, file_new_name) => {
+  //             if (err) {
+  //               Taro.showToast({
+  //                 title: "上传失败",
+  //                 icon: "none",
+  //               });
+  //               return;
+  //             }
+  //             console.log(res);
+  //             setFormData((pre) => ({
+  //               ...pre,
+  //               safeSiteImgsOrPdf: [
+  //                 ...(pre.safeSiteImgsOrPdf || []),
+  //                 {
+  //                   name: item.name,
+  //                   fileID: res.fileID,
+  //                   nameStore: file_new_name,
+  //                 },
+  //               ],
+  //             }));
+  //           });
+  //         }
+  //       );
+  //     },
+  //   });
+  // };
+
+  // 处理复选框选择
+  const handleCheckboxChange = (e) => {
+    setFormData({
+      ...formData,
+      vocPreventionMeasures: e.detail.value,
     });
   };
 
@@ -451,10 +343,17 @@ export default function Summer() {
       });
       return;
     }
+    if (!formData.constructionCompanyName) {
+      Taro.showToast({
+        title: "请填写施工单位名称",
+        icon: "none",
+      });
+      return;
+    }
 
     if (!formData.companyCode) {
       Taro.showToast({
-        title: "请填写组织机构代码",
+        title: "请填写施工单位组织机构代码",
         icon: "none",
       });
       return;
@@ -602,112 +501,10 @@ export default function Summer() {
       }
     }
 
-    // 4. 检查全电工地证明
-    if (formData.isSafeSite === 1 && formData.safeSiteImgsOrPdf.length === 0) {
-      Taro.showToast({
-        title: "请上传全电工地证明文件",
-        icon: "none",
-      });
-      return;
-    }
-
-    // 6. 检查非全电工地情况下的运输车辆和非道路移动机械
-    if (formData.isSafeSite === 0) {
-      // 检查运输车辆
-      if (formData.transportVehicleList.length === 0) {
-        Taro.showToast({
-          title: "请添加至少一辆运输车辆",
-          icon: "none",
-        });
-        return;
-      }
-
-      // 检查每辆运输车辆的必填信息
-      for (let i = 0; i < formData.transportVehicleList.length; i++) {
-        const vehicle = formData.transportVehicleList[i];
-        if (!vehicle.vehicleName) {
-          Taro.showToast({
-            title: `请选择第${i + 1}辆运输车辆的类型`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!vehicle.vehicleCount) {
-          Taro.showToast({
-            title: `请填写第${i + 1}辆运输车辆的数量`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!vehicle.vehicleOilSource) {
-          Taro.showToast({
-            title: `请选择第${i + 1}辆运输车辆的加油来源`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!vehicle.vehicleEmissionStandard) {
-          Taro.showToast({
-            title: `请选择第${i + 1}辆运输车辆的排放标准`,
-            icon: "none",
-          });
-          return;
-        }
-      }
-
-      // 检查非道路移动机械
-      if (formData.nonRoadMobileEquipmentList.length === 0) {
-        Taro.showToast({
-          title: "请添加至少一台非道路移动机械",
-          icon: "none",
-        });
-        return;
-      }
-
-      // 检查每台非道路移动机械的必填信息
-      for (let i = 0; i < formData.nonRoadMobileEquipmentList.length; i++) {
-        const equipment = formData.nonRoadMobileEquipmentList[i];
-        if (!equipment.equipmentName) {
-          Taro.showToast({
-            title: `请选择第${i + 1}台非道路移动机械的名称`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!equipment.equipmentCount) {
-          Taro.showToast({
-            title: `请填写第${i + 1}台非道路移动机械的数量`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!equipment.equipmentOilSource) {
-          Taro.showToast({
-            title: `请选择第${i + 1}台非道路移动机械的加油来源`,
-            icon: "none",
-          });
-          return;
-        }
-
-        if (!equipment.equipmentEmissionStandard) {
-          Taro.showToast({
-            title: `请选择第${i + 1}台非道路移动机械的排放标准`,
-            icon: "none",
-          });
-          return;
-        }
-      }
-    }
-
     // 5. 检查挥发性有机物防治措施
-    if (!formData.vocPreventionMeasures) {
+    if (formData.vocPreventionMeasures.length === 0) {
       Taro.showToast({
-        title: "请填写挥发性有机物防治措施",
+        title: "请选择挥发性有机物防治措施",
         icon: "none",
       });
       return;
@@ -786,12 +583,32 @@ export default function Summer() {
             />
           </View>
           <View className="form_item">
-            <View className="label">组织机构代码：</View>
+            <View className="label">施工单位名称：</View>
             <Input
               className="input"
-              placeholder="请输入组织机构代码"
+              placeholder="请输入施工单位名称"
+              value={formData.constructionCompanyName}
+              onInput={(e) =>
+                handleChange("constructionCompanyName", e.detail.value)
+              }
+            />
+          </View>
+          <View
+            className="form_item"
+            style={{
+              flexDirection: "column",
+              alignItems: "start",
+              justifyContent: "center",
+              height: 70,
+            }}
+          >
+            <View className="label">施工单位组织机构代码：</View>
+            <Input
+              className="input"
+              placeholder="请输入施工单位组织机构代码"
               value={formData.companyCode}
               onInput={(e) => handleChange("companyCode", e.detail.value)}
+              style={{ marginLeft: 6, width: "100%" }}
             />
           </View>
           <View className="form_item">
@@ -815,25 +632,6 @@ export default function Summer() {
               onInput={(e) =>
                 handleChange("projectManagerPhone", e.detail.value)
               }
-            />
-          </View>
-          <View className="form_item" style={{ borderBottom: "none" }}>
-            <View className="label">是否受法人授权：</View>
-            <Switch
-              options={[
-                {
-                  label: "是",
-                  value: 1,
-                },
-                {
-                  label: "否",
-                  value: 0,
-                },
-              ]}
-              defaultValue={1}
-              onSelect={(value) => {
-                handleChange("isAuthorized", value);
-              }}
             />
           </View>
         </View>
@@ -952,7 +750,7 @@ export default function Summer() {
                     paddingRight: 4,
                   }}
                 >
-                  <View className="picker">
+                  <View className="picker" style={{ whiteSpace: "nowrap" }}>
                     {formData.startTime || "选择开始日期"}
                   </View>
                 </Picker>
@@ -1022,12 +820,17 @@ export default function Summer() {
         <View className="form_section">
           <View
             className="section_title"
-            style={{ display: "flex", justifyContent: "space-between" }}
+            style={{ display: "flex", flexDirection: "column" }}
           >
-            <Text>主要原辅材料（必填）</Text>
-            <View className="add_material" onClick={handleAddMaterial}>
-              新增原辅材料
+            <View style={{ display: "flex", justifyContent: "space-between" }}>
+              <Text>主要原辅材料（必填）</Text>
+              <View className="add_material" onClick={handleAddMaterial}>
+                新增原辅材料
+              </View>
             </View>
+            <Text style={{ color: "red", fontSize: 14, fontWeight: 400 }}>
+              若有多种原辅材料请点击新增原辅材料
+            </Text>
           </View>
           <View className="material_list">
             {formData.materialList?.map((item: Material) => (
@@ -1037,7 +840,6 @@ export default function Summer() {
                   <Input
                     className="input"
                     placeholder="请输入主要原辅材料"
-                    // value={item.materialName}
                     onInput={(e) =>
                       setFormData((pre) => ({
                         ...pre,
@@ -1052,7 +854,7 @@ export default function Summer() {
                   />
                 </View>
                 <View className="form_item">
-                  <View className="label">数量和单位：</View>
+                  <View className="label">施工期间原辅材料用量：</View>
                   <Input
                     className="input"
                     placeholder="请输入"
@@ -1063,7 +865,7 @@ export default function Summer() {
                           if (item1.id === item.id) {
                             return {
                               ...item1,
-                              materialCount: e.detail.value,
+                              materialCount: `${e.detail.value}kg`,
                             };
                           }
                           return item1;
@@ -1071,32 +873,7 @@ export default function Summer() {
                       }))
                     }
                   />
-                  <Switch
-                    options={[
-                      {
-                        label: "年",
-                        value: "year",
-                      },
-                      {
-                        label: "月",
-                        value: "month",
-                      },
-                    ]}
-                    onSelect={(value: string) => {
-                      setFormData((pre) => ({
-                        ...pre,
-                        materialList: pre.materialList.map((item1) => {
-                          if (item1.id === item.id) {
-                            return {
-                              ...item1,
-                              materialUnit: value,
-                            };
-                          }
-                          return item1;
-                        }),
-                      }));
-                    }}
-                  />
+                  <View style={{ color: "#494747", marginRight: 10 }}>kg</View>
                 </View>
                 <View className="form_item">
                   <View className="label">VOCs容量是否低于10%</View>
@@ -1150,7 +927,7 @@ export default function Summer() {
                 <View className="form_item">
                   <View className="label">
                     {item.isVocRateLower === 1
-                      ? "低 VOCs 原辅材料证明："
+                      ? "水性/低VOCs原辅材料证明："
                       : "VOCs 原辅材料证明："}
                   </View>
                   <View
@@ -1224,643 +1001,6 @@ export default function Summer() {
           </View>
         </View>
 
-        {/* 第四部分 - 是否为全电工地 */}
-        <View className="form_section">
-          <View className="section_title">是否为全电工地（必填）</View>
-          <View
-            className="form_item"
-            style={{
-              border: "none",
-              alignItems: "flex-start",
-              flexDirection: "column",
-              // height: 120,
-              gap: 10,
-            }}
-          >
-            <Switch
-              options={[
-                {
-                  label: "是",
-                  value: 1,
-                },
-                {
-                  label: "否",
-                  value: 0,
-                },
-              ]}
-              onSelect={(value) => {
-                if (value === 0) {
-                  // 如果填否，就根据运输车辆和非道路移动机械设备列表的默认值
-                  setFormData((prev) => ({
-                    ...prev,
-                    isSafeSite: value as number,
-                    safeSiteImgsOrPdf: [],
-                    transportVehicleList: [
-                      ...prev.transportVehicleList,
-                      {
-                        id: Date.now().toString(),
-                        vehicleName: "",
-                        vehicleCount: '0',
-                        vehicleOilSource: "",
-                        vehicleEmissionStandard: "",
-                        vehicleIsRegistered: 1,
-                        vehicleIsDustCover: 1,
-                      },
-                    ],
-                    nonRoadMobileEquipmentList: [
-                      ...prev.nonRoadMobileEquipmentList,
-                      {
-                        id: Date.now().toString(),
-                        equipmentName: "",
-                        equipmentCount: '0',
-                        equipmentOilSource: "",
-                        equipmentEmissionStandard: "",
-                        equipmentIsRegistered: 1,
-                        equipmentIsDustCover: 1,
-                      },
-                    ],
-                  }));
-                } else {
-                  setFormData((prev) => ({
-                    ...prev,
-                    isSafeSite: value as number,
-                    transportVehicleList: [],
-                    nonRoadMobileEquipmentList: [],
-                  }));
-                }
-              }}
-            />
-            {formData.isSafeSite === 1 && (
-              <View className="prompt">{prompt}</View>
-            )}
-            {formData.isSafeSite === 1 && (
-              <View className="upload_btn" onClick={handleElectricSiteUpload}>
-                点击上传全电工地证明(图片或者PDF 文件)
-              </View>
-            )}
-          </View>
-          {formData.safeSiteImgsOrPdf?.length > 0 &&
-            formData.isSafeSite === 1 && (
-              <View className="material_item_imgs">
-                {formData.safeSiteImgsOrPdf?.map((img: File, imgIndex) => (
-                  <CustomImage
-                    deleteFn={(url) => {
-                      setFormData((pre) => ({
-                        ...pre,
-                        safeSiteImgsOrPdf: pre.safeSiteImgsOrPdf.filter(
-                          (item) => item.fileID !== url
-                        ),
-                      }));
-                    }}
-                    key={`${imgIndex}-${img.fileID}`}
-                    file={img}
-                  />
-                ))}
-              </View>
-            )}
-        </View>
-
-        {/* 第五部分 - 运输车辆 */}
-        {!formData?.isSafeSite && (
-          <View className="form_section">
-            <View
-              className="section_title"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <Text>运输车辆（必填）</Text>
-              <View
-                className="add_material"
-                onClick={handleAddTransportVehicle}
-              >
-                新增运输车辆
-              </View>
-            </View>
-            <View className="material_list">
-              {formData.transportVehicleList?.map((item: TransportVehicle) => (
-                <View className="material_item">
-                  <View className="form_item">
-                    <View className="label">运输车辆名称：</View>
-                    <Picker
-                      mode="selector"
-                      range={transportVehicleTypeList}
-                      onChange={(e) => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleName:
-                                    transportVehicleTypeList[e.detail.value],
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }));
-                      }}
-                      style={{
-                        fontSize: 16,
-                        color: formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleName
-                          ? "#000"
-                          : "#8a8989",
-                        flex: 1,
-                      }}
-                    >
-                      <View className="picker">
-                        {formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleName
-                          ? `${
-                              formData.transportVehicleList.find(
-                                (item1) => item1.id === item.id
-                              )?.vehicleName
-                            }`
-                          : "请选择运输车辆类型"}
-                      </View>
-                    </Picker>
-                  </View>
-                  <View className="form_item">
-                    <View className="label">数量：</View>
-                    <Input
-                      className="input"
-                      placeholder="请输入"
-                      onInput={(e) =>
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleCount: e.detail.value,
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }))
-                      }
-                    />
-                  </View>
-
-                  <View className="form_item">
-                    <View className="label">加油来源：</View>
-                    <Picker
-                      mode="selector"
-                      range={oilSourceList}
-                      onChange={(e) => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleOilSource:
-                                    oilSourceList[e.detail.value],
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }));
-                      }}
-                      style={{
-                        fontSize: 16,
-                        color: formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleOilSource
-                          ? "#000"
-                          : "#8a8989",
-                        flex: 1,
-                      }}
-                    >
-                      <View className="picker">
-                        {formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleOilSource
-                          ? `${
-                              formData.transportVehicleList.find(
-                                (item1) => item1.id === item.id
-                              )?.vehicleOilSource
-                            }`
-                          : "请选择加油来源"}
-                      </View>
-                    </Picker>
-                  </View>
-
-                  <View
-                    className="form_item"
-                    style={{ justifyContent: "flex-start" }}
-                  >
-                    <View className="label">排放标准：</View>
-                    <Picker
-                      mode="selector"
-                      range={vehicleEmissionStandardList}
-                      onChange={(e) => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleEmissionStandard:
-                                    vehicleEmissionStandardList[e.detail.value],
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }));
-                      }}
-                      style={{
-                        fontSize: 16,
-                        color: formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleEmissionStandard
-                          ? "#000"
-                          : "#8a8989",
-                        flex: 1,
-                      }}
-                    >
-                      <View className="picker">
-                        {formData.transportVehicleList.find(
-                          (item1) => item1.id === item.id
-                        )?.vehicleEmissionStandard
-                          ? `${
-                              formData.transportVehicleList.find(
-                                (item1) => item1.id === item.id
-                              )?.vehicleEmissionStandard
-                            }`
-                          : "请选择排放标准"}
-                      </View>
-                    </Picker>
-                  </View>
-
-                  <View className="form_item" style={{ borderBottom: "none" }}>
-                    <View className="label">是否备案：</View>
-                    <Switch
-                      options={[
-                        {
-                          label: "是",
-                          value: 1,
-                        },
-                        {
-                          label: "否",
-                          value: 0,
-                        },
-                      ]}
-                      defaultValue={1}
-                      onSelect={(value) => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleIsRegistered: value as number,
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }));
-                      }}
-                    />
-                  </View>
-
-                  <View className="form_item" style={{ borderBottom: "none" }}>
-                    <View className="label">有无防尘罩：</View>
-                    <Switch
-                      options={[
-                        {
-                          label: "是",
-                          value: 1,
-                        },
-                        {
-                          label: "否",
-                          value: 0,
-                        },
-                      ]}
-                      defaultValue={1}
-                      onSelect={(value) => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          transportVehicleList: pre.transportVehicleList.map(
-                            (item1) => {
-                              if (item1.id === item.id) {
-                                return {
-                                  ...item1,
-                                  vehicleIsDustCover: value as number,
-                                };
-                              }
-                              return item1;
-                            }
-                          ),
-                        }));
-                      }}
-                    />
-                  </View>
-
-                  <View
-                    className="delete_material"
-                    onClick={() => {
-                      setFormData((pre) => ({
-                        ...pre,
-                        transportVehicleList: pre.transportVehicleList.filter(
-                          (item1) => item1.id !== item.id
-                        ),
-                      }));
-                    }}
-                  >
-                    删除
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* 第六部分 - 非道路移动机械设备 */}
-        {!formData?.isSafeSite && (
-          <View className="form_section">
-            <View
-              className="section_title"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <Text>非道路移动机械名称（必填）</Text>
-              <View
-                className="add_material"
-                onClick={handleAddNonRoadMobileEquipment}
-              >
-                新增非道路移动机械
-              </View>
-            </View>
-            <View className="material_list">
-              {formData.nonRoadMobileEquipmentList?.map(
-                (item: NonRoadMobileEquipment) => (
-                  <View className="material_item">
-                    <View className="form_item">
-                      <View className="label">非道路移动机械名称：</View>
-                      <Picker
-                        mode="selector"
-                        range={nonRoadMobileEquipmentCategoryList}
-                        onChange={(e) => {
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentName:
-                                      nonRoadMobileEquipmentCategoryList[
-                                        e.detail.value
-                                      ],
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }));
-                        }}
-                        style={{
-                          fontSize: 16,
-                          color: formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentName
-                            ? "#000"
-                            : "#8a8989",
-                          flex: 1,
-                        }}
-                      >
-                        <View className="picker">
-                          {formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentName
-                            ? `${
-                                formData.nonRoadMobileEquipmentList.find(
-                                  (item1) => item1.id === item.id
-                                )?.equipmentName
-                              }`
-                            : "请选择非道路移动机械名称"}
-                        </View>
-                      </Picker>
-                    </View>
-                    <View className="form_item">
-                      <View className="label">数量：</View>
-                      <Input
-                        className="input"
-                        placeholder="请输入"
-                        onInput={(e) =>
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentCount: e.detail.value,
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }))
-                        }
-                      />
-                    </View>
-
-                    <View className="form_item">
-                      <View className="label">加油来源：</View>
-                      <Picker
-                        mode="selector"
-                        range={oilSourceList}
-                        onChange={(e) => {
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentOilSource:
-                                      oilSourceList[e.detail.value],
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }));
-                        }}
-                        style={{
-                          fontSize: 16,
-                          color: formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentOilSource
-                            ? "#000"
-                            : "#8a8989",
-                          flex: 1,
-                        }}
-                      >
-                        <View className="picker">
-                          {formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentOilSource
-                            ? `${
-                                formData.nonRoadMobileEquipmentList.find(
-                                  (item1) => item1.id === item.id
-                                )?.equipmentOilSource
-                              }`
-                            : "请选择加油来源"}
-                        </View>
-                      </Picker>
-                    </View>
-
-                    <View
-                      className="form_item"
-                      style={{ justifyContent: "flex-start" }}
-                    >
-                      <View className="label">排放标准：</View>
-                      <Picker
-                        mode="selector"
-                        range={nonRoadMobileEquipmentEmissionStandardList}
-                        onChange={(e) => {
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentEmissionStandard:
-                                      nonRoadMobileEquipmentEmissionStandardList[
-                                        e.detail.value
-                                      ],
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }));
-                        }}
-                        style={{
-                          fontSize: 16,
-                          color: formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentEmissionStandard
-                            ? "#000"
-                            : "#8a8989",
-                          flex: 1,
-                        }}
-                      >
-                        <View className="picker">
-                          {formData.nonRoadMobileEquipmentList.find(
-                            (item1) => item1.id === item.id
-                          )?.equipmentEmissionStandard
-                            ? `${
-                                formData.nonRoadMobileEquipmentList.find(
-                                  (item1) => item1.id === item.id
-                                )?.equipmentEmissionStandard
-                              }`
-                            : "请选择排放标准"}
-                        </View>
-                      </Picker>
-                    </View>
-
-                    <View
-                      className="form_item"
-                      style={{ borderBottom: "none" }}
-                    >
-                      <View className="label">是否备案：</View>
-                      <Switch
-                        options={[
-                          {
-                            label: "是",
-                            value: 1,
-                          },
-                          {
-                            label: "否",
-                            value: 0,
-                          },
-                        ]}
-                        defaultValue={1}
-                        onSelect={(value) => {
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentIsRegistered: value as number,
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }));
-                        }}
-                      />
-                    </View>
-
-                    <View
-                      className="form_item"
-                      style={{ borderBottom: "none" }}
-                    >
-                      <View className="label">有无防尘罩：</View>
-                      <Switch
-                        options={[
-                          {
-                            label: "是",
-                            value: 1,
-                          },
-                          {
-                            label: "否",
-                            value: 0,
-                          },
-                        ]}
-                        defaultValue={1}
-                        onSelect={(value) => {
-                          setFormData((pre) => ({
-                            ...pre,
-                            nonRoadMobileEquipmentList:
-                              pre.nonRoadMobileEquipmentList.map((item1) => {
-                                if (item1.id === item.id) {
-                                  return {
-                                    ...item1,
-                                    equipmentIsDustCover: value as number,
-                                  };
-                                }
-                                return item1;
-                              }),
-                          }));
-                        }}
-                      />
-                    </View>
-
-                    <View
-                      className="delete_material"
-                      onClick={() => {
-                        setFormData((pre) => ({
-                          ...pre,
-                          nonRoadMobileEquipmentList:
-                            pre.nonRoadMobileEquipmentList.filter(
-                              (item1) => item1.id !== item.id
-                            ),
-                        }));
-                      }}
-                    >
-                      删除
-                    </View>
-                  </View>
-                )
-              )}
-            </View>
-          </View>
-        )}
-
         {/* 第五部分 - 挥发性有机物防治措施 */}
         <View className="form_section">
           <View className="section_title">挥发性有机物防治措施（必填）</View>
@@ -1869,23 +1009,40 @@ export default function Summer() {
             style={{
               flexDirection: "column",
               height: "unset",
-              minHeight: 100,
-              alignItems: "start ",
+              alignItems: "start",
               borderBottom: "none",
             }}
           >
             <View className="label">挥发性有机物防治措施：</View>
-            <Textarea
-              className="input"
-              placeholder="请输入挥发性有机物防治措施"
-              value={formData.vocPreventionMeasures}
-              onInput={(e) =>
-                handleChange("vocPreventionMeasures", e.detail.value)
-              }
+            <CheckboxGroup
               style={{
                 marginTop: 10,
+                width: "100%",
+                border: "1px solid #ccc",
+                borderRadius: 4,
+                padding: 8,
+                boxSizing: "border-box",
               }}
-            />
+              onChange={handleCheckboxChange}
+            >
+              {vocPreventionMeasuresList.map((measure) => (
+                <View
+                  key={measure}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Checkbox
+                    value={measure}
+                    checked={formData.vocPreventionMeasures.includes(measure)}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={{ fontSize: 14 }}>{measure}</Text>
+                </View>
+              ))}
+            </CheckboxGroup>
           </View>
         </View>
       </View>
