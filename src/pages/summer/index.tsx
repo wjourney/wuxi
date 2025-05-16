@@ -183,7 +183,7 @@ export default function Summer() {
         ...formData.materialList,
         {
           materialName: "",
-          materialCount: "0",
+          materialCount: "",
           isVocRateLower: 1,
           lowerVocMaterialImgsOrPdf: [],
           vocSupportImgsOrPdf: [],
@@ -470,7 +470,7 @@ export default function Summer() {
       }
       if (!material.materialCount) {
         Taro.showToast({
-          title: `请填写第${i + 1}个材料的数量`,
+          title: `请填写第${i + 1}个原辅材料的施工期间原辅材料用量`,
           icon: "none",
         });
         return;
@@ -482,7 +482,7 @@ export default function Summer() {
         material.lowerVocMaterialImgsOrPdf.length === 0
       ) {
         Taro.showToast({
-          title: `请上传第${i + 1}个原辅材料的低VOCs证明文件`,
+          title: `请上传第${i + 1}个原辅材料的水性/低VOCs证明文件`,
           icon: "none",
         });
         return;
@@ -865,7 +865,9 @@ export default function Summer() {
                           if (item1.id === item.id) {
                             return {
                               ...item1,
-                              materialCount: `${e.detail.value}kg`,
+                              materialCount: !!e.detail.value
+                                ? `${e.detail.value}kg`
+                                : "",
                             };
                           }
                           return item1;
