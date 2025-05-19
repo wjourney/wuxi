@@ -83,6 +83,7 @@ interface Project {
 
   // 挥发性有机物防治措施
   vocPreventionMeasures: string[];
+  agreedToTerms: boolean; // 添加协议同意状态
 }
 
 interface LocationData {
@@ -132,6 +133,7 @@ export default function Summer() {
     projectContent: "",
     materialList: [] as Material[],
     vocPreventionMeasures: [],
+    agreedToTerms: false, // 初始化协议同意状态
   };
 
   // 表单数据状态
@@ -323,6 +325,28 @@ export default function Summer() {
     });
   };
 
+  // 处理协议勾选
+  const handleAgreementChange = (e) => {
+    setFormData({
+      ...formData,
+      agreedToTerms: e.detail.value.length > 0,
+    });
+  };
+
+  // 跳转到用户服务协议页面
+  const navigateToUserAgreement = () => {
+    Taro.navigateTo({
+      url: "/pages/user-agreement/index",
+    });
+  };
+
+  // 跳转到隐私政策页面
+  const navigateToPrivacyPolicy = () => {
+    Taro.navigateTo({
+      url: "/pages/privacy-policy/index",
+    });
+  };
+
   // 提交表单
   const handleSubmit = async () => {
     console.log(">>>>>formData", formData, JSON.stringify(formData));
@@ -510,6 +534,16 @@ export default function Summer() {
       return;
     }
 
+    // 检查是否同意协议
+    if (!formData.agreedToTerms) {
+      Taro.showToast({
+        title: "请阅读并同意用户服务协议和隐私政策",
+        icon: "none",
+      });
+      return;
+    }
+    const { agreedToTerms, ...submitData } = formData;
+
     // 校验通过，执行提交操作
     try {
       // 表单数据都已经验证通过，可以调用接口提交数据
@@ -523,7 +557,7 @@ export default function Summer() {
             "X-WX-SERVICE": "koa-s36g",
           },
           method: "POST",
-          data: formData,
+          data: submitData,
         } as any);
         console.log("提交结果：", result);
         if (result.statusCode === 200) {
@@ -1044,6 +1078,37 @@ export default function Summer() {
                   <Text style={{ fontSize: 14 }}>{measure}</Text>
                 </View>
               ))}
+            </CheckboxGroup>
+          </View>
+        </View>
+
+        {/* 添加协议勾选部分 */}
+        <View className="">
+          <View className="form_item" style={{ borderBottom: "none" }}>
+            <CheckboxGroup onChange={handleAgreementChange}>
+              <View style={{ display: "flex", alignItems: "center" }}>
+                <Checkbox
+                  value="agreed"
+                  checked={formData.agreedToTerms}
+                  style={{ marginRight: 8 }}
+                />
+                <Text style={{ fontSize: 14 }}>
+                  我已阅读并同意
+                  <Text
+                    style={{ color: "#0cc", marginLeft: 4 }}
+                    onClick={navigateToUserAgreement}
+                  >
+                    《用户服务协议》
+                  </Text>
+                  和
+                  <Text
+                    style={{ color: "#0cc", marginLeft: 4 }}
+                    onClick={navigateToPrivacyPolicy}
+                  >
+                    《隐私政策》
+                  </Text>
+                </Text>
+              </View>
             </CheckboxGroup>
           </View>
         </View>

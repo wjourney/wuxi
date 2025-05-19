@@ -1,0 +1,61 @@
+.privacy-page {
+    padding: 20px;
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.privacy-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+
+    .title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+    }
+}
+
+.privacy-content {
+    .section {
+        margin-bottom: 24px;
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .section-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            display: block;
+        }
+    }
+}
+
+.ul {
+    margin: 8px 0 8px 16px;
+    padding: 0;
+}
+
+.li {
+    position: relative;
+    padding-left: 18px;
+    /* 保持原有字体和颜色不变 */
+}
+
+.li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #666;
+    font-size: 18px;
+    top: 0;
+    line-height: 1.2;
+}
